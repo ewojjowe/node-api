@@ -1,82 +1,79 @@
 const Product = require('../models/productModels')
+const asyncHandler = require('express-async-handler')
 
-const createProducts = async (req, res) => {
+const createProducts = asyncHandler(async (req, res) => {
   try {
     const product = await Product.create(req.body)
     if (!product) {
-      res.status(500).json({ message: `Cannot create product` })
-      return
+      res.status(500)
+      throw new Error(`Cannot create product`)
     }
     res.status(200).json(product)
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ message: error.message })
+    res.status(500)
+    throw new Error(error.message)
   }
-}
+})
 
-const getProducts = async (req, res) => {
+const getProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
-    if (!products) {
-      res.status(404).json({ message: `Cannot find any products` })
-      return
+    if (products && products.length === 0) {
+      res.status(404)
+      throw new Error(`Cannot find any products`)
     }
     res.status(200).json(products)
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ message: error.message })
+    res.status(500)
+    throw new Error(error.message)
   }
-}
+})
 
-const getProduct = async (req, res) => {
+const getProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params
     const product = await Product.findById(id)
     if (!product) {
-      res
-        .status(404)
-        .json({ message: `Cannot find any product with ID: ${id}` })
-      return
+      res.status(404)
+      throw new Error(`Cannot find any product with ID: ${id}`)
     }
     res.status(200).json(product)
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ message: error.message })
+    res.status(500)
+    throw new Error(error.message)
   }
-}
+})
 
-const updateProduct = async (req, res) => {
+const updateProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params
     await Product.findByIdAndUpdate(id, req.body)
     const product = await Product.findById(id)
     if (!product) {
-      res
-        .status(404)
-        .json({ message: `Cannot find the product with ID: ${id}` })
-      return
+      res.status(404)
+      throw new Error(`Cannot find and update the product with ID: ${id}`)
     }
     res.status(200).json(product)
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ message: error.message })
+    res.status(500)
+    throw new Error(error.message)
   }
-}
+})
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params
     const product = await Product.findByIdAndDelete(id)
     if (!product) {
-      res.status(404).json({ message: `Cannot find product with ID: ${id}` })
-      return
+      res.status(404)
+      throw new Error(`Cannot find and delete the product with ID: ${id}`)
     }
     res.status(200).json(product)
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ message: error.message })
+    res.status(500)
+    throw new Error(error.message)
   }
-}
+})
 
 module.exports = {
   createProducts,
