@@ -1,7 +1,20 @@
-const Product = require('../models/productModels')
 const asyncHandler = require('express-async-handler')
 
+const Product = require('../models/productModels')
+const { productValidation } = require('../validation/productValidation')
+
 const createProducts = asyncHandler(async (req, res) => {
+  // validate input
+  const { error } = productValidation(req.body)
+  if (error) throw new Error(error.details[0].message)
+
+  // Check if name already exist
+  const { name } = req.body
+  const productExist = await Product.findOne({ name })
+  console.log(productExist)
+  if (productExist) throw new Error('Product name already exist!')
+
+  // Create product
   try {
     const product = await Product.create(req.body)
     if (!product) {
